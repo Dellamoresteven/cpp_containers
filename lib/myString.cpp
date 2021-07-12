@@ -5,7 +5,7 @@ int char_size(const char* str) {
     return i;
 }
 
-void mystrncpy(char *dst, const char *src, size_t n) {
+void mystrncpy(char *dst, const char *src, unsigned int n) {
    char *temp = dst;
    for (int i = 0; i < n; i++)
        dst[i] = src[i];

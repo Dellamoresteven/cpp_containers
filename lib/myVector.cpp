@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "myString.cpp"
-
 template <typename T>
 class myVector {
     private:
@@ -55,22 +53,3 @@ class myVector {
         printf("]\n");
     }
 };
-
-#include <iostream>
-using namespace std;
-int main () {
-    //myVector<std::string> vec(10);
-    myVector<myString> vec(10);
-    vec.push("hello");
-    vec.push(" ");
-    vec.push("world");
-    vec.push("\n");
-    for(int i = 0; i < vec.size(); i++) {
-        printf("%s", vec.at(i).c_str());
-    }
-
-    //for(int i = 0; i < 10000; i++) {
-        //vec.push(i);
-    //}
-    //vec.print();
-}
