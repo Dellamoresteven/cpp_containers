@@ -6,9 +6,10 @@ namespace myHashMap {
 
 template <typename K, typename V>
 struct node {
-    node(const K &key, const V &value) : key(key), value(value) {}
+    node(const K &key, const V &value) : key(key), value(value), deleted(false) {}
     K key;
     V value;
+    bool deleted;
 };
 
 template <typename K, typename V>
@@ -18,9 +19,7 @@ class myHashMap {
     unsigned int num_buckets;
     unsigned int curr_size;
 
-    unsigned long hashFunc(const K &key) {
-        //auto _hash =  reinterpret_cast<unsigned long>(key) % num_buckets;
-        //return _hash;
+    unsigned long hashFunc(int key) {
         return key % this->num_buckets;
     }
 
@@ -29,14 +28,21 @@ class myHashMap {
         printf("Rehashing %d -> %d\n", this->num_buckets/2, this->num_buckets);
         node<K,V> ** newContainer = new node<K,V>*[num_buckets];
         for(int i = 0; i < num_buckets/2; ++i) {
-            newContainer[hashFunc(container[i]->key)] = container[i];
+            if(container[i] != NULL) {
+                int _hash = hashFunc(container[i]->key);
+                while(newContainer[_hash] != NULL) {
+                    _hash++;
+                    _hash %= this->num_buckets;
+                }
+                newContainer[_hash] = container[i];
+            }
         }
         delete[] container;
         container = newContainer;
     }
 
     void findCorrectHash(int &_hash, const K key) {
-        while(this->container[_hash] != NULL && this->container[_hash]->key != key) {
+        while(this->container[_hash] != NULL && this->container[_hash]->key != key && this->container[_hash]->deleted == false) {
             _hash++;
             _hash %= this->num_buckets;
         }
@@ -60,11 +66,12 @@ class myHashMap {
         int _hash = hashFunc(key);
         this->curr_size++;
 
-        if(this->num_buckets < this->curr_size)
+        if(this->num_buckets < this->curr_size) {
             rehash();
+        }
 
         findCorrectHash(_hash, key);
-        if(this->container[_hash] != NULL) {
+        if(this->container[_hash] != NULL && this->container[_hash]->deleted == false) {
             this->curr_size--;
             return;
         }
@@ -86,12 +93,16 @@ class myHashMap {
 
     bool remove(const K &key) {
         int _hash = hashFunc(key);
-        findCorrectHash(_hash, key);
-        if(this->container[_hash] == NULL) 
+        while(this->container[_hash]->key != key && this->container[_hash]->deleted == false) {
+            _hash++;
+            _hash %= this->num_buckets;
+        }
+
+        if(this->container[_hash] == NULL || this->container[_hash]->deleted == true)
             return false;
-        delete this->container[_hash];
-        this->container[_hash] = NULL;
-        this->curr_size--;
+        this->container[_hash]->deleted = true;
+        this->container[_hash]->value = -1;
+        //this->curr_size--;
         return true;
     }
 
@@ -101,8 +112,8 @@ class myHashMap {
 
     void print() {
         for (int i = 0; i < this->num_buckets; i++) {
-            if(this->container[i] != NULL) {
-                printf("%d -> %d\n", this->container[i]->key, this->container[i]->value);
+            if(this->container[i] != NULL && this->container[i]->deleted != true) {
+                printf("%d -> %d, %d\n", this->container[i]->key, this->container[i]->value, this->container[i]->deleted);
             }
         }
     }
