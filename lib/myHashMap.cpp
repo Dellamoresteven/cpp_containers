@@ -93,13 +93,14 @@ class myHashMap {
 
     bool remove(const K &key) {
         int _hash = hashFunc(key);
-        while(this->container[_hash]->key != key && this->container[_hash]->deleted == false) {
+        while(this->container[_hash]->key != key && this->container[_hash]->deleted == true) {
             _hash++;
             _hash %= this->num_buckets;
         }
 
-        if(this->container[_hash] == NULL || this->container[_hash]->deleted == true)
+        if(this->container[_hash] == NULL || this->container[_hash]->deleted == true || this->container[_hash]->key != key) {
             return false;
+        }
         this->container[_hash]->deleted = true;
         this->container[_hash]->value = -1;
         //this->curr_size--;
@@ -112,8 +113,14 @@ class myHashMap {
 
     void print() {
         for (int i = 0; i < this->num_buckets; i++) {
-            if(this->container[i] != NULL && this->container[i]->deleted != true) {
-                printf("%d -> %d, %d\n", this->container[i]->key, this->container[i]->value, this->container[i]->deleted);
+            if(this->container[i] != NULL) {
+                if(this->container[i]->deleted) {
+                    printf("DELETED\n");
+                } else {
+                    printf("%d->%d,%d\n", this->container[i]->key, this->container[i]->value, this->container[i]->deleted);
+                }
+            } else {
+                printf("NULL\n");
             }
         }
     }

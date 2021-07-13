@@ -7,16 +7,14 @@ using namespace std;
 
 int main() {
     myHashMap::myHashMap<int,int> map(10);
-    for(int i = 100; i < 130; i++) {
+    for(int i = 0; i < 10; i++) {
         map.add(i*5,i);
     }
     map.print();
     printf("------------------\n");
-    //map.remove(100);
-    for(int i = 100; i < 130; i++) {
+    for(int i = 0; i < 10; i++) {
         map.remove(i*5);
     }
-    map.add(100,100);
     map.print();
     //for(int i = 0; i < 100; i++) {
         //map.add(i*5, 100+i);
