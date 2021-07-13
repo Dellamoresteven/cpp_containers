@@ -6,10 +6,9 @@ namespace myHashMap {
 
 template <typename K, typename V>
 struct node {
-    node(const K key, const V value) : key(key), value(value), next(nullptr) {}
+    node(const K &key, const V &value) : key(key), value(value) {}
     K key;
     V value;
-    node * next;
 };
 
 template <typename K, typename V>
@@ -17,6 +16,7 @@ class myHashMap {
     private:
     node<K, V> ** container;
     unsigned int num_buckets;
+    unsigned int curr_size;
 
     unsigned long hashFunc(const K &key) {
         //auto _hash =  reinterpret_cast<unsigned long>(key) % num_buckets;
@@ -24,84 +24,85 @@ class myHashMap {
         return key % this->num_buckets;
     }
 
+    void rehash() {
+        this->num_buckets *= 2;
+        printf("Rehashing %d -> %d\n", this->num_buckets/2, this->num_buckets);
+        node<K,V> ** newContainer = new node<K,V>*[num_buckets];
+        for(int i = 0; i < num_buckets/2; ++i) {
+            newContainer[hashFunc(container[i]->key)] = container[i];
+        }
+        delete[] container;
+        container = newContainer;
+    }
+
+    void findCorrectHash(int &_hash, const K key) {
+        while(this->container[_hash] != NULL && this->container[_hash]->key != key) {
+            _hash++;
+            _hash %= this->num_buckets;
+        }
+    }
+
     public:
     myHashMap() = delete;
-    myHashMap(unsigned int num_buckets) : container(new node<K,V>*[num_buckets]), num_buckets(num_buckets) {}
+    myHashMap(unsigned int num_buckets) : container(new node<K,V>*[num_buckets]), num_buckets(num_buckets), curr_size(0) {
+    }
 
     ~myHashMap() {
         for(int i = 0; i < this->num_buckets; ++i) {
-            node<K,V> * curr_node = this->container[i];
-            while(curr_node != nullptr) {
-                node<K,V> * prev_node = curr_node;
-                curr_node = curr_node->next;
-                delete prev_node;
-            }
-            this->container[i] = nullptr;
+            if(this->container[i] != NULL)
+                delete container[i];
         }
         delete[] container;
     }
 
+
     void add(const K key, const V value) {
         int _hash = hashFunc(key);
-        node<K,V> * curr_node = container[_hash];
-        if(curr_node == NULL) {
-            container[_hash] = new node<K,V>(key, value);
+        this->curr_size++;
+
+        if(this->num_buckets < this->curr_size)
+            rehash();
+
+        findCorrectHash(_hash, key);
+        if(this->container[_hash] != NULL) {
+            this->curr_size--;
             return;
         }
-        while(curr_node->next != nullptr) {
-            if(curr_node->key == key) { return; }
-            curr_node = curr_node->next;
-        }
-        curr_node->next = new node<K,V>(key, value);
+        this->container[_hash] = new node<K,V>(key, value);
+    }
+
+    bool contains(const K &key) {
+        int _hash = hashFunc(key);
+        findCorrectHash(_hash, key);
+        return (this->container[_hash] != NULL && this->container[_hash]->key == key);
     }
 
     V get(const K &key) {
         int _hash = hashFunc(key);
-        node<K,V> *curr_node = this->container[_hash];
-        while(curr_node->key != key && curr_node->next != nullptr) {
-            curr_node = curr_node->next;
-        }
-        if(curr_node->next == nullptr && curr_node->key != key) { throw "out of bounds"; }
-        if(curr_node->key == key) { return curr_node->value; }
+        findCorrectHash(_hash, key);
+        // This will SEGV if value is not in the container unsafe, but should call "contains" before "get"
+        return this->container[_hash]->value;
     }
 
     bool remove(const K &key) {
         int _hash = hashFunc(key);
-        node<K,V> *curr_node = this->container[_hash];
-        node<K,V> *prev_node = NULL;
-        while(curr_node->key != key && curr_node->next != nullptr) {
-            prev_node = curr_node;
-            curr_node = curr_node->next;
-        }
+        findCorrectHash(_hash, key);
+        if(this->container[_hash] == NULL) 
+            return false;
+        delete this->container[_hash];
+        this->container[_hash] = NULL;
+        this->curr_size--;
+        return true;
+    }
 
-        if(prev_node == NULL) {
-            this->container[_hash] = this->container[_hash]->next;
-            delete curr_node;
-            return true;
-        }
-
-        if(curr_node->key == key) {
-            if(curr_node->next != nullptr) {
-                prev_node->next = curr_node->next;
-            } else {
-                prev_node->next = nullptr;
-            }
-            delete curr_node;
-            return true;
-        };
-        return false;
+    int getSize() {
+        return curr_size;
     }
 
     void print() {
         for (int i = 0; i < this->num_buckets; i++) {
-            if(this->container[i] != nullptr) {
-                node<V,K> * curr_node = this->container[i];
-                printf("%d", curr_node->value);
-                while(curr_node->next != nullptr) {
-                    curr_node = curr_node->next;
-                    printf(" -> %d", curr_node->value);
-                }
-                printf("\n");
+            if(this->container[i] != NULL) {
+                printf("%d -> %d\n", this->container[i]->key, this->container[i]->value);
             }
         }
     }
