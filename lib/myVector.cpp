@@ -7,6 +7,7 @@ class myVector {
     unsigned int curr_size;
     unsigned int cap;
     public:
+    myVector() : container(new T[1]), cap(1), curr_size(0){}
     myVector(unsigned int default_size) : container(new T[default_size]), cap(default_size), curr_size(0){}
 
     ~myVector() {
