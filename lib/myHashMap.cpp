@@ -1,15 +1,13 @@
-
-
 #pragma once
 
 namespace myHashMap {
 
 template <typename K, typename V>
 struct node {
-    node(const K &key, const V &value) : key(key), value(value), deleted(false) {}
+    node(const K &key, const V &value) : key(key), value(value), next(NULL) {}
     K key;
     V value;
-    bool deleted;
+    node * next;
 };
 
 template <typename K, typename V>
@@ -19,33 +17,10 @@ class myHashMap {
     unsigned int num_buckets;
     unsigned int curr_size;
 
-    unsigned long hashFunc(int key) {
+    unsigned long hashFunc(const K &key) {
+        //auto _hash =  reinterpret_cast<unsigned long>(key) % num_buckets;
+        //return _hash;
         return key % this->num_buckets;
-    }
-
-    void rehash() {
-        this->num_buckets *= 2;
-        printf("Rehashing %d -> %d\n", this->num_buckets/2, this->num_buckets);
-        node<K,V> ** newContainer = new node<K,V>*[num_buckets];
-        for(int i = 0; i < num_buckets/2; ++i) {
-            if(container[i] != NULL) {
-                int _hash = hashFunc(container[i]->key);
-                while(newContainer[_hash] != NULL) {
-                    _hash++;
-                    _hash %= this->num_buckets;
-                }
-                newContainer[_hash] = container[i];
-            }
-        }
-        delete[] container;
-        container = newContainer;
-    }
-
-    void findCorrectHash(int &_hash, const K key) {
-        while(this->container[_hash] != NULL && this->container[_hash]->key != key && this->container[_hash]->deleted == false) {
-            _hash++;
-            _hash %= this->num_buckets;
-        }
     }
 
     public:
@@ -55,8 +30,14 @@ class myHashMap {
 
     ~myHashMap() {
         for(int i = 0; i < this->num_buckets; ++i) {
-            if(this->container[i] != NULL)
-                delete container[i];
+            if(this->container[i] != NULL) {
+                node<K,V> * curr_node = this->container[i];
+                while(curr_node != NULL) {
+                    node<K,V> * prev_node = curr_node;
+                    curr_node = curr_node->next;
+                    delete prev_node;
+                }
+            }
         }
         delete[] container;
     }
@@ -66,45 +47,66 @@ class myHashMap {
         int _hash = hashFunc(key);
         this->curr_size++;
 
-        if(this->num_buckets < this->curr_size) {
-            rehash();
+        if(this->container[_hash] == NULL) {
+            this->container[_hash] = new node<K,V>(key,value);
+            return;
         }
 
-        findCorrectHash(_hash, key);
-        if(this->container[_hash] != NULL && this->container[_hash]->deleted == false) {
+        node<K,V> * curr_node = this->container[_hash];
+        node<K,V> * prev_node = NULL;
+        while(curr_node != NULL && curr_node->key != key) {
+            prev_node = curr_node;
+            curr_node = curr_node->next;
+        }
+        if(curr_node != NULL) {
             this->curr_size--;
             return;
         }
-        this->container[_hash] = new node<K,V>(key, value);
+        prev_node->next = new node<K,V>(key, value);
     }
 
     bool contains(const K &key) {
         int _hash = hashFunc(key);
-        findCorrectHash(_hash, key);
-        return (this->container[_hash] != NULL && this->container[_hash]->key == key);
+        node<K,V> * curr_node = this->container[_hash];
+        while(curr_node != NULL && curr_node->key != key && curr_node->next != NULL) {
+            curr_node = curr_node->next;
+        }
+        return curr_node->key == key;
     }
 
     V get(const K &key) {
         int _hash = hashFunc(key);
-        findCorrectHash(_hash, key);
-        // This will SEGV if value is not in the container unsafe, but should call "contains" before "get"
-        return this->container[_hash]->value;
+        node<K,V> * curr_node = this->container[_hash];
+        while(curr_node != NULL && curr_node->key != key && curr_node->next != NULL) {
+            curr_node = curr_node->next;
+        }
+        if(curr_node->key == key) {
+            return curr_node->value;
+        } else {
+            throw "Could not find";
+        }
     }
 
     bool remove(const K &key) {
         int _hash = hashFunc(key);
-        while(this->container[_hash]->key != key && this->container[_hash]->deleted == true) {
-            _hash++;
-            _hash %= this->num_buckets;
+        node<K,V> * curr_node = this->container[_hash];
+        node<K,V> * prev_node = NULL;
+        while(curr_node != NULL && curr_node->key != key && curr_node->next != NULL) {
+            prev_node = curr_node;
+            curr_node = curr_node->next;
         }
-
-        if(this->container[_hash] == NULL || this->container[_hash]->deleted == true || this->container[_hash]->key != key) {
-            return false;
+        if(curr_node->key == key) {
+            if(prev_node == NULL) {
+                //delete curr_node;
+                this->container[_hash] = curr_node->next;
+            } else {
+                prev_node->next = curr_node->next;
+            }
+            delete curr_node;
+            this->curr_size--;
+            return true;
         }
-        this->container[_hash]->deleted = true;
-        this->container[_hash]->value = -1;
-        //this->curr_size--;
-        return true;
+        return false;
     }
 
     int getSize() {
@@ -114,11 +116,13 @@ class myHashMap {
     void print() {
         for (int i = 0; i < this->num_buckets; i++) {
             if(this->container[i] != NULL) {
-                if(this->container[i]->deleted) {
-                    printf("DELETED\n");
-                } else {
-                    printf("%d->%d,%d\n", this->container[i]->key, this->container[i]->value, this->container[i]->deleted);
+                printf("[%d]->%d", this->container[i]->key, this->container[i]->value);
+                node<K,V> * curr_node = this->container[i]->next;
+                while(curr_node != NULL) {
+                    printf(" + [%d]->%d", curr_node->key, curr_node->value);
+                    curr_node = curr_node->next;
                 }
+                printf("\n");
             } else {
                 printf("NULL\n");
             }
