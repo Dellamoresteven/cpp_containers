@@ -3,3 +3,8 @@
 #include "myHashMap.cpp"
 #include "mySet.cpp"
 #include "myQuickSort.cpp"
+#include "myQueue.cpp"
+#include "myStack.cpp"
+#include "myBinaryTree.cpp"
+#include "myBFS.cpp"
+#include "myDFS.cpp"

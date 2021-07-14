@@ -44,6 +44,15 @@ class myVector {
         container[index] = val;
     }
 
+    void remove(int index) {
+        if(index > curr_size)
+            return;
+        for(int i = index; i < curr_size-1; i++) {
+            container[i] = container[i+1];
+        }
+        curr_size--;
+    }
+
     T get(int index) {
         return (index < curr_size ? container[index] : nullptr);
     }

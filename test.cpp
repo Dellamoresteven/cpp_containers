@@ -57,13 +57,36 @@ int main() {
     //myVector<int>::print_vector(vecf);
 
 
-    mySet<int> sett(10);
-    for(int i = 0; i < 50; i++) {
-        sett.add(i);
-    }
-    sett.print();
-    for(int i = 40; i < 50; i++) {
-        sett.remove(i);
-    }
-    sett.print();
+    //mySet<int> sett(10);
+    //for(int i = 0; i < 50; i++) {
+        //sett.add(i);
+    //}
+    //sett.print();
+    //for(int i = 40; i < 50; i++) {
+        //sett.remove(i);
+    //}
+    //printf("-------------\n");
+    //sett.print();
+
+
+    //myQueue<int> q;
+    //q.push(5);
+    //q.push(6);
+    //q.push(7);
+    //q.push(8);
+    //printf("%d\n", q.pop());
+    //printf("SIZE: %d\n", q.size());
+    //q.print();
+    //
+    binaryTree::myBinaryTree btree;
+    btree.add(10);
+    btree.add(8);
+    btree.add(7);
+    btree.add(6);
+    btree.add(5);
+    btree.find(5);
+    printf("-----\n");
+    btree.balance_tree();
+    btree.find(6);
+    btree.print();
 }
