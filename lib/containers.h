@@ -9,3 +9,4 @@
 #include "myGraph.cpp"
 #include "myBFS.cpp"
 #include "myDFS.cpp"
+#include "binarySearch.cpp"

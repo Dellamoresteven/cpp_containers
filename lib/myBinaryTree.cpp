@@ -68,14 +68,20 @@ namespace binaryTree {
             curr_node->right = buildNewTree(inOrderNodes, midPoint+1, end);
         }
 
-        //inline void free_memory(int key, node * curr_node) {
-        //}
+        inline void free_memory(node * curr_node) {
+            if(curr_node == NULL)
+                return;
+            free_memory(curr_node->left);
+            free_memory(curr_node->right);
+            delete curr_node;
+        }
 
         public:
         myBinaryTree() : root(NULL) {
         }
 
         ~myBinaryTree() {
+            free_memory(root);
         }
 
         void add(int key) {
