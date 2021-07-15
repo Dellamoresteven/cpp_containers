@@ -6,5 +6,6 @@
 #include "myQueue.cpp"
 #include "myStack.cpp"
 #include "myBinaryTree.cpp"
+#include "myGraph.cpp"
 #include "myBFS.cpp"
 #include "myDFS.cpp"

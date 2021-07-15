@@ -56,13 +56,12 @@ int main() {
     //cout << "Sorted array: \n";
     //myVector<int>::print_vector(vecf);
 
-
-    //mySet<int> sett(10);
+    //mySet<int> sett(50);
     //for(int i = 0; i < 50; i++) {
         //sett.add(i);
     //}
     //sett.print();
-    //for(int i = 40; i < 50; i++) {
+    //for(int i = 0; i < 50; i++) {
         //sett.remove(i);
     //}
     //printf("-------------\n");
@@ -77,17 +76,30 @@ int main() {
     //printf("%d\n", q.pop());
     //printf("SIZE: %d\n", q.size());
     //q.print();
-    //
-    binaryTree::myBinaryTree btree;
-    btree.add(10);
-    btree.add(8);
-    btree.add(7);
-    btree.add(6);
-    btree.add(5);
-    btree.find(5);
-    btree.print();
-    printf("-----\n");
-    btree.balance_tree();
-    btree.find(6);
-    btree.print();
+
+
+    //binaryTree::myBinaryTree btree;
+    //btree.add(10);
+    //btree.add(8);
+    //btree.add(7);
+    //btree.add(6);
+    //btree.add(5);
+    //btree.find(5);
+    //btree.print();
+    //printf("-----\n");
+    //btree.balance_tree();
+    //btree.find(6);
+    //btree.print();
+
+
+    graph::myGraph g(10);
+    g.addEdge(0, 1);
+    g.addEdge(0, 9);
+    g.addEdge(1, 2);
+    g.addEdge(2, 0);
+    g.addEdge(2, 3);
+    g.addEdge(9, 3);
+    g.print();
+    g.BFS(0);
+    g.DFS(2);
 }

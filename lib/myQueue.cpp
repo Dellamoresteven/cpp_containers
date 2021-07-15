@@ -6,6 +6,8 @@ class myQueue {
     myVector<T> container;
 
     myQueue() {}
+    ~myQueue() {
+    }
 
     void push(T val) {
         container.push(val);

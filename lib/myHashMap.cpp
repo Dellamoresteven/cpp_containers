@@ -26,6 +26,10 @@ class myHashMap {
     public:
     myHashMap() = delete;
     myHashMap(unsigned int num_buckets) : container(new node<K,V>*[num_buckets]), num_buckets(num_buckets), curr_size(0) {
+        // WHAT
+        for(int i = 0; i < num_buckets; i++) {
+            container[i] = NULL;
+        }
     }
 
     ~myHashMap() {
@@ -68,6 +72,8 @@ class myHashMap {
     bool contains(const K &key) {
         int _hash = hashFunc(key);
         node<K,V> * curr_node = this->container[_hash];
+        if(curr_node == NULL)
+            return false;
         while(curr_node != NULL && curr_node->key != key && curr_node->next != NULL) {
             curr_node = curr_node->next;
         }

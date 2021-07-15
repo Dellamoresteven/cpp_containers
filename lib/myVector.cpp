@@ -9,7 +9,11 @@ class myVector {
     unsigned int cap;
     public:
     myVector() : container(new T[1]), cap(1), curr_size(0){}
-    myVector(unsigned int default_size) : container(new T[default_size]), cap(default_size), curr_size(0){}
+    myVector(unsigned int default_size) : container(new T[default_size]), cap(default_size), curr_size(0){
+        for(int i = 0; i < default_size; i++) {
+            container[i] = 0;
+        }
+    }
     myVector(const myVector &copyVec) {
         cap = copyVec.capacity();
         curr_size = copyVec.size();

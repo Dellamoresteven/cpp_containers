@@ -10,6 +10,8 @@ class mySet {
     mySet(int num_buckets) : myMap(myHashMap::myHashMap<T,bool>(num_buckets)) {
 
     }
+    ~mySet() {
+    }
 
     void add(T key) {
         myMap.add(key, false);
