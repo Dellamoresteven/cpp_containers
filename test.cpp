@@ -85,6 +85,7 @@ int main() {
     btree.add(6);
     btree.add(5);
     btree.find(5);
+    btree.print();
     printf("-----\n");
     btree.balance_tree();
     btree.find(6);

@@ -33,10 +33,8 @@ namespace binaryTree {
                 if(curr_node->data == key) {
                     return curr_node;
                 } else if(key >= curr_node->data) {
-                    printf("right\n");
                     find(key, curr_node->right);
                 } else if(key < curr_node->data) {
-                    printf("left\n");
                     find(key, curr_node->left);
                 } else {
                     throw "What in the world";
@@ -51,6 +49,14 @@ namespace binaryTree {
             getInOrderNodes(curr_node->left, nodes);
             nodes.push(curr_node);
             getInOrderNodes(curr_node->right, nodes);
+        }
+
+        void printPreOrder(node * curr_node) {
+            if(curr_node == NULL)
+                return;
+            printf("%d ", curr_node->data);
+            printPreOrder(curr_node->left);
+            printPreOrder(curr_node->right);
         }
 
         node * buildNewTree(myVector<node*> &inOrderNodes, int start, int end) {
@@ -91,12 +97,8 @@ namespace binaryTree {
         }
 
         void print() {
-            myVector<node*> inOrderNodes;
-            getInOrderNodes(root, inOrderNodes);
             printf("inOrder: ");
-            for(int i = 0; i < inOrderNodes.size(); i++) {
-                printf("%d ", inOrderNodes.at(i)->data);
-            }
+            printPreOrder(root);
             printf("\n");
         }
     };
