@@ -10,3 +10,4 @@
 #include "myBFS.cpp"
 #include "myDFS.cpp"
 #include "binarySearch.cpp"
+#include "myMinHeap.cpp"
